@@ -7,7 +7,7 @@ public class ThreeMainTest {
      * @date 2019/7/31 21:21a
     */
     public static void main(String[] args){
-
+        addBinary("1010", "1011");
     }
 
     /**
@@ -35,7 +35,7 @@ public class ThreeMainTest {
      * @param b
      * @return
      */
-    public String addBinary(String a, String b) {
+    public static String addBinary(String a, String b) {
         if (a.equals("0")) return b;
         if (b.equals("0")) return a;
         int la = a.length(), lb= b.length();
@@ -43,10 +43,22 @@ public class ThreeMainTest {
         StringBuilder sb = new StringBuilder();
         int up = la >= lb ? la : lb;
         int low = la < lb ? la : lb;
-        for (int i = up; i >= 0; i--){
-
+        int sum = 0, pop = 0;
+        for (int i = 0; i < up; i++){
+            if (i < low)
+                sum = a.charAt(la-i-1) - 48 + b.charAt(lb-i-1) - 48 + pop;
+            else if (a.length() > b.length()){
+                sum = pop + a.charAt(la-i-1) - 48;
+            }else {
+                sum = pop + b.charAt(lb-i-1) - 48;
+            }
+            sb.append(sum % 2);
+            pop = sum/2;
         }
-        return sb.toString();
-
+        sb.reverse();
+        return pop == 1 ? "1" + sb.toString() : sb.toString();
     }
+
+
+
 }
