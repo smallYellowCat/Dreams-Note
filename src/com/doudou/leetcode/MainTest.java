@@ -22,7 +22,7 @@ public class MainTest {
         //multiply("123", "456");
         //List<List<Integer>> list = permuteUnique(n);
         //groupAnagrams(str);
-        myPow(2.0d, -2);
+        //myPow(2.0d, -2);
         System.out.println();
     }
 
@@ -96,7 +96,7 @@ public class MainTest {
         return true;
     }
 
-    Map<String, String> phone = new HashMap<>() {{
+    Map<String, String> phone = new HashMap() {{
         put("2", "abc");
         put("3", "def");
         put("4", "ghi");
