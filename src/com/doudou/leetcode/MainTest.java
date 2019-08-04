@@ -23,7 +23,10 @@ public class MainTest {
         //List<List<Integer>> list = permuteUnique(n);
         //groupAnagrams(str);
         //myPow(2.0d, -2);
+<<<<<<< HEAD
         lengthOfLastWord("a");
+=======
+>>>>>>> 5c9ae400c770a01cb837d527a8b65685efb54db6
         System.out.println();
     }
 
@@ -97,7 +100,7 @@ public class MainTest {
         return true;
     }
 
-    Map<String, String> phone = new HashMap<>() {{
+    Map<String, String> phone = new HashMap() {{
         put("2", "abc");
         put("3", "def");
         put("4", "ghi");

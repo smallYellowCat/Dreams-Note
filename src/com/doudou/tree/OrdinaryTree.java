@@ -1,25 +1,36 @@
 package com.doudou.tree;
 
-import lombok.Getter;
-import lombok.Setter;
+public class OrdinaryTree<E> {
 
-import java.util.List;
+    private TreeNode<E> treeNode;
+    private int depth;
+    private int hight;
 
-/**
-*普通树
-*作者：豆豆
-*时间:2017/10/16
-*/
-public class OrdinaryTree {
-    private Node root;
+    private TreeNode<E> root;
 
+    public OrdinaryTree(TreeNode<E> treeNode){
+        this.treeNode = treeNode;
+        this.root = treeNode;
+        this.depth = 0;
+        this.hight = 0;
 
-}
+    }
 
-@Getter
-@Setter
-class Node{
-    private Object data; //数据域
-    private Node father; //父节点
-    private List<Node> son; //子节点
+    public TreeNode<E> getRoot(){
+        return this.root;
+    }
+
+    public void insert(TreeNode<E> parent, TreeNode<E> node){
+        node.setParenNode(parent);
+        if (parent.getFirstChild() == null){
+            parent.setFirstChild(node);
+        }else if (parent.getNextSibling() == null){
+            parent.setNextSibling(node);
+        }else{
+            TreeNode<E> nextSibling = parent.getNextSibling();
+            insert(nextSibling, node);
+        }
+    }
+
+    //public
 }
