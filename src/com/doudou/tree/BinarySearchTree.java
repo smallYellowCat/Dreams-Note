@@ -3,6 +3,10 @@ package com.doudou.tree;
 import java.nio.BufferUnderflowException;
 import java.util.Comparator;
 
+/**
+ * ADT/BST  binary search tree
+ * @param <T>
+ */
 public class BinarySearchTree<T extends Comparable<? super T>> {
 
 
@@ -194,13 +198,35 @@ public class BinarySearchTree<T extends Comparable<? super T>> {
         return node;
     }
 
+    /**
+     * Internal Method to remove from a subTree
+     * @param e the item to remove
+     * @param node the node that roots the subtree
+     * @return the new root of the subtree
+     */
     private BinaryNode<T> remove(T e, BinaryNode<T> node){
-        return null;
+        if (root == null) return null;
+        int compareResult = e.compareTo(root.e);
+
+        if (compareResult < 0)
+            root.left = remove(e, root.left);
+        else if (compareResult > 0)
+            root.right = remove(e, root.right);
+        else if (root.left != null && root.right != null){
+            //tow child
+            root.e = findMin(root.right).e;
+            root.right = remove(root.e, root.right);
+        }
+        else
+            root = (root.left != null) ? root.left : root.right;
+
+        return root;
     }
 
     private void printTree(BinaryNode<T> node){
 
     }
+
 
 
 
