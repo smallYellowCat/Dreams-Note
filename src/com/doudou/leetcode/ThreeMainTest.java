@@ -1,7 +1,8 @@
 package com.doudou.leetcode;
 
 
-import java.util.Stack;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ThreeMainTest {
     /**
@@ -129,6 +130,33 @@ public class ThreeMainTest {
 
         //sb.reverse();
         return sb.toString();
+    }
+
+    /**
+     * 1~n 之间所有的k个数的组合
+     * @param n
+     * @param k
+     * @return
+     */
+    public List<List<Integer>> combine(int n, int k) {
+        List<List<Integer>> rs = new ArrayList<>();
+        if (n < k) return rs;
+        backTrack(n, 1, k, new ArrayList<>(), rs);
+        return rs;
+
+    }
+
+    static void backTrack(int n, int start, int k, List<Integer> list, List<List<Integer>> rs){
+        if (list.size() == k) {
+
+            rs.add(new ArrayList<>(list));
+            return;
+        }
+        for (int i = start; i <= n; i++){
+            list.add(i);
+            backTrack(n, i+1, k, list, rs);
+            list.remove(list.size() - 1);
+        }
     }
 
 
