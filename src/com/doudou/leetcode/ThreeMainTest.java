@@ -12,7 +12,9 @@ public class ThreeMainTest {
     */
     public static void main(String[] args){
         //addBinary("1010", "1011");
-        simplifyPath("/../");
+        //simplifyPath("/../");
+        int[] n = {1,3};
+        search(n,0);
     }
 
     /**
@@ -216,6 +218,72 @@ public class ThreeMainTest {
         visited[i][j] = false;
         return false;
     }
+
+
+    /**
+     * leetcode 80 题， 使用O(1)的空间删除重复元素，每个元素最多出现两次，
+     * 返回删除后的长度，数组修改对调用者可见
+     *
+     * 前提： 数组已排序
+     * @param nums
+     * @return
+     */
+    public int removeDuplicates(int[] nums) {
+        int i = 0;
+        for (int n : nums){
+            if (i < 2 || n != nums[i-2]){
+                nums[i] = n;
+                i++;
+            }
+        }
+        return i;
+    }
+
+
+    /**
+     * 搜索旋转排序数组，要求时间复杂度为O(log n)
+     * @param nums
+     * @param target
+     * @return
+     */
+    public static int search(int[] nums, int target) {
+        if (nums.length == 0) return -1;
+
+        int smallextIndex = 0, biggestIndex = nums.length - 1;
+        for (int i = 0; i < nums.length; i++){
+            if (i< nums.length - 1 && nums[i] > nums[i+1]){
+                smallextIndex = i + 1;
+                biggestIndex = i;
+                break;
+            }
+        }
+
+        //binary search
+        int start, end;
+        if (target > nums[nums.length - 1]){
+            //在前半部分找
+            start = 0;
+            end = biggestIndex;
+
+        }else {
+           //在后半部分找
+            start = smallextIndex;
+            end = nums.length - 1;
+
+        }
+        int mid = start;
+        while (start < end && nums[mid] != target){
+            mid = (start + end) / 2;
+            if (nums[mid] > target)
+                end = mid;
+            else if (nums[mid] < target)
+                start = ++mid;
+            else break;
+        }
+        return nums[mid] == target ? mid : -1;
+
+    }
+
 
 
 
