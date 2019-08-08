@@ -14,7 +14,16 @@ public class ThreeMainTest {
         //addBinary("1010", "1011");
         //simplifyPath("/../");
         int[] n = {1,3};
-        search(n,0);
+        //search(n,0);
+        ListNode head = new ListNode(1);
+        head.next = new ListNode(2);
+        head.next.next = new ListNode(3);
+        head.next.next.next = new ListNode(3);
+        head.next.next.next.next = new ListNode(3);
+        head.next.next.next.next.next = new ListNode(4);
+        head.next.next.next.next.next.next = new ListNode(5);
+        deleteDuplicates(head);
+
     }
 
     /**
@@ -282,6 +291,52 @@ public class ThreeMainTest {
         }
         return nums[mid] == target ? mid : -1;
 
+    }
+
+    /**
+     * leetcode 第82题 ， 给定一个排序链表，删除所有含有重复数字的节点，只保留原始链表中
+     * 没有重复出现 的数字。
+     *  输入: 1->2->3->3->4->4->5
+     *  输出: 1->2->5
+     *
+     * @param head
+     * @return
+     */
+    public static ListNode deleteDuplicates(ListNode head) {
+        if (head == null) return head;
+        ListNode dummy = new ListNode(-1000);
+        dummy.next = head;
+        ListNode slow = dummy;
+        ListNode fast = dummy.next;
+        while (fast != null) {
+            while (fast.next != null && fast.val == fast.next.val) fast = fast.next;
+            if (slow.next == fast) slow = slow.next;
+            else slow.next = fast.next;
+            fast = fast.next;
+        }
+        return dummy.next;
+
+    }
+
+    /**
+     * 二叉树中序遍历
+     * @param root
+     * @return
+     */
+    public List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> rs = new ArrayList<>();
+        inorderTraversal(root, rs);
+        return rs;
+    }
+
+    private void inorderTraversal(TreeNode root, List<Integer> rs){
+        if (root == null) return ;
+        if (root.left != null)
+            inorderTraversal(root.left, rs);
+        rs.add(root.val);
+        if (root.right != null) {
+            inorderTraversal(root.right, rs);
+        }
     }
 
 
