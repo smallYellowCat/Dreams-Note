@@ -159,6 +159,64 @@ public class ThreeMainTest {
         }
     }
 
+    /**
+     * 求子集
+     * @param nums
+     * @return
+     */
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> rs = new ArrayList<>();
+        backtrack(0, nums, rs, new ArrayList<>());
+        return rs;
+    }
+
+    void backtrack(int i, int[] nums, List<List<Integer>> rs, List<Integer> list){
+        rs.add(new ArrayList<>(list));
+        for (int j = i; j < nums.length; j++){
+            list.add(nums[j]);
+            backtrack(j + 1, nums, rs, list);
+            list.remove(list.size() - 1);
+        }
+    }
+
+
+    /**
+     * 单词搜索
+     * @param board
+     * @param word
+     * @return
+     */
+    public boolean exist(char[][] board, String word) {
+        //得到行列长度
+        int row =  board.length, column = board[0].length;
+
+        boolean[][] visited = new boolean[row][column];
+
+        for (int i = 0; i < row; i++){
+            for (int j = 0; j < column; j++){
+                //成功条件
+                if (word.charAt(0) == board[i][j] && backtrack(i, j, 0, word, visited, board))
+                    return true;
+            }
+        }
+
+        return false;
+
+    }
+
+    private boolean backtrack(int i, int j, int idx, String word, boolean[][] visited, char[][] board){
+        if (idx == word.length()) return true;
+        if (i >= board.length || i < 0 || j >= board[0].length || j < 0 || board[i][j] != word.charAt(idx) || visited[i][j])
+            return false;
+        visited[i][j] = true;
+
+        if (backtrack(i+1, j, idx+1, word, visited, board) || backtrack(i-1, j, idx+1, word, visited, board)
+                || backtrack(i, j+1, idx+1, word, visited, board) || backtrack(i, j-1, idx+1, word, visited, board))
+            return true;
+        visited[i][j] = false;
+        return false;
+    }
+
 
 
 }
