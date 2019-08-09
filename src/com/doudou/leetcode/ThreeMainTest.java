@@ -1,8 +1,9 @@
 package com.doudou.leetcode;
 
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 public class ThreeMainTest {
     /**
@@ -24,6 +25,9 @@ public class ThreeMainTest {
         head.next.next.next.next.next.next = new ListNode(5);
         deleteDuplicates(head);
 
+        //int [] n = {2,0,1};
+        //simplifyPath("/../");
+        //sortColors(n);
     }
 
     /**
@@ -141,6 +145,46 @@ public class ThreeMainTest {
 
         //sb.reverse();
         return sb.toString();
+    }
+
+    /**
+     * 矩阵置0， 有0的位置行列置0
+     * @param matrix
+     */
+    public void setZeroes(int[][] matrix) {
+
+    }
+
+
+    /**
+     * 矩阵搜索
+     * @param matrix
+     * @param target
+     * @return
+     */
+    public boolean searchMatrix(int[][] matrix, int target) {
+        return false;
+    }
+
+
+    /**
+     * 颜色数组排序，荷兰国旗问题
+     * @param nums
+     */
+    public static void sortColors(int[] nums) {
+        int p0 = 0, p1 = nums.length - 1, i = 0;
+        while (i < nums.length && i <= p1){
+            if (nums[i] == 0){
+                nums[i] = nums[p0];
+                nums[p0] = 0;
+                p0++;
+            }else if (nums[i] == 2){
+                nums[i] = nums[p1];
+                nums[p1] = 2;
+                p1--;
+            }
+            i++;
+        }
     }
 
     /**

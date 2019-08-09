@@ -23,6 +23,7 @@ public class MainTest {
         //List<List<Integer>> list = permuteUnique(n);
         //groupAnagrams(str);
         //myPow(2.0d, -2);
+        //lengthOfLastWord("a");
         System.out.println();
     }
 
@@ -451,6 +452,26 @@ public class MainTest {
             }
         }
         return lastPos == 0;
+    }
+
+    public static  int lengthOfLastWord(String s) {
+        if (s.length() == 0) return 0;
+        int star = 0, end = 0;
+        for (int i = s.length() - 1; i >= 0; i--) {
+            if (s.charAt(i) == ' ') continue;
+            star = i;
+            break;
+        }
+        int j = star;
+        while (j >= 0) {
+            if (s.charAt(j) == ' ') {
+                end = j;
+                break;
+            }
+            j--;
+            end = j;
+        }
+        return star - end;
     }
 
 }
