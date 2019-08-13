@@ -10,6 +10,8 @@ import java.util.Random;
 public class QuickSort {
     private static int[] data = new int[1001];
     public static void main(String[] args){
+        //Integer.MAX_VALUE;
+        //Integer.MIN_VALUE;
         //自动生成main
         for (int i = 0; i < data.length; i++){
             data[i] = new Random().nextInt(1000000000);
@@ -57,4 +59,6 @@ public class QuickSort {
         quicksort(left, i-1);
         quicksort(i+1, right);
     }
+
+
 }

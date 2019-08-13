@@ -23,11 +23,14 @@ public class ThreeMainTest {
         head.next.next.next.next = new ListNode(3);
         head.next.next.next.next.next = new ListNode(4);
         head.next.next.next.next.next.next = new ListNode(5);
-        deleteDuplicates(head);
+        //deleteDuplicates(head);
 
         //int [] n = {2,0,1};
         //simplifyPath("/../");
         //sortColors(n);
+
+        //countBits(2);
+        divide(8,2);
     }
 
     /**
@@ -413,6 +416,54 @@ public class ThreeMainTest {
                     backtrack(j + 1, tmp + s.substring(i, j + 1) + ".", flag - 1, s, res, n);
             }
         }
+    }
+
+
+    /**
+     * 统计[0,num]中各个数对应二进制数中1的个数
+     * @param num
+     * @return
+     */
+    public static int[] countBits(int num) {
+        int[] rs = new int[num+1];
+        for (int i = 0; i <= num; i++){
+            int count = 0;
+            int j = i;
+            while (j != 0){
+                if (j % 2 == 1) count++;
+                j = (j/2);
+            }
+            rs[i] = count;
+        }
+        return rs;
+    }
+
+    /**
+     * 两数相除
+     * @param dividend
+     * @param divisor
+     * @return
+     */
+    public static int divide(int dividend, int divisor) {
+        int sign = (dividend ^ divisor) >> 31;
+        long lDividend = Math.abs((long) dividend);
+        long lDivisor = Math.abs((long) divisor);
+        long res = 0;
+        while (lDividend >= lDivisor){
+            long tmp = lDivisor;
+            long i = 1;
+            while (lDividend >= tmp){
+                lDividend -= tmp;
+                res += i;
+                i <<= 1;
+                tmp <<= 1;
+            }
+        }
+        if (sign == -1) res *= -1;
+        if (res < Integer.MIN_VALUE) return Integer.MIN_VALUE;
+        else if (res > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        return (int)res;
+
     }
 
 
