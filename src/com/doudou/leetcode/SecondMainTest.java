@@ -36,8 +36,11 @@ public class SecondMainTest {
         listNode.next.next.next = new ListNode(4);
         listNode.next.next.next.next = new ListNode(5);
         //rotateRight(listNode, 2);
-        minPathSum(n);
+        //minPathSum(n);
 
+        ListNode pre = listNode;
+        pre.next = null;
+        System.out.println("");
 
 
     }
