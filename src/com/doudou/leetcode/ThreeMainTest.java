@@ -349,7 +349,7 @@ public class ThreeMainTest {
      * @param head
      * @return
      */
-    public static ListNode deleteDuplicates(ListNode head) {
+    public static ListNode deleteDuplicates2(ListNode head) {
         if (head == null) return head;
         ListNode dummy = new ListNode(-1000);
         dummy.next = head;
@@ -464,6 +464,26 @@ public class ThreeMainTest {
         else if (res > Integer.MAX_VALUE) return Integer.MAX_VALUE;
         return (int)res;
 
+    }
+
+    /**
+     * leetcode 83
+     * 排序链表删除所有的重复元素
+     * @param head
+     * @return
+     */
+    public ListNode deleteDuplicates(ListNode head) {
+        if (head == null) return head;
+        ListNode pre = head;
+        while (pre.next != null){
+            if (pre.val == pre.next.val){
+                pre.next = pre.next.next;
+            }else {
+                pre = pre.next;
+            }
+
+        }
+        return head;
     }
 
 
