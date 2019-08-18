@@ -545,6 +545,40 @@ public class FourMainTest {
         return generate_trees(1, n);
     }
 
+    /**
+     * 判断是否是相同的树, leetcode 100
+     * @param p
+     * @param q
+     * @return
+     */
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        return check(p, q);
+    }
+
+    boolean check(TreeNode p, TreeNode q){
+        if (p == null && q == null) return true;
+        if (q == null  ||  p == null) return false;
+        if (p.val != q.val) return false;
+        return check(p.left, q.left) && check(p.right, q.right);
+    }
+
+    /**
+     * 检查二叉树是否镜像对称
+     * @param root
+     * @return
+     */
+    public boolean isSymmetric(TreeNode root) {
+        if (root == null) return true;
+        return isSymmetric(root.right)&&isSymmetric(root.left);
+    }
+
+    public boolean checkSymmetric(TreeNode left, TreeNode right){
+        if (left == null && right == null) return true;
+        if (left == null || right == null) return false;
+        if (left.val != right.val) return false;
+        return checkSymmetric(left.left, right.right) && checkSymmetric(left.right, right.left);
+    }
+
 
 
 }
