@@ -579,6 +579,28 @@ public class FourMainTest {
         return checkSymmetric(left.left, right.right) && checkSymmetric(left.right, right.left);
     }
 
+    /**
+     * leetcode 102
+     * 二叉树的层次遍历
+     * @param root
+     * @return
+     */
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> rs = new ArrayList<>();
+        if (root == null) return rs;
+        rs.add(new ArrayList<>(){{add(root.val);}});
+        hierarchicalTraversal(rs, new ArrayList<>(), root.left, root.right);
+        return rs;
+    }
+
+    void hierarchicalTraversal(List<List<Integer>> rs, List<Integer> list, TreeNode left, TreeNode right){
+        if (left != null)
+            list.add(left.val);
+        if (right != null)
+            list.add(right.val);
+
+    }
+
 
 
 }
