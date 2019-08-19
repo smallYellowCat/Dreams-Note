@@ -585,22 +585,20 @@ public class FourMainTest {
      * @param root
      * @return
      */
+    List<List<Integer>> levels = new ArrayList<List<Integer>>();
+
+    public void helper(TreeNode node, int level) {
+        if (levels.size() == level) levels.add(new ArrayList<>());
+        levels.get(level).add(node.val);
+        if (node.left != null) helper(node.left, level+1);
+        if (node.right != null) helper(node.right, level+1);
+    }
+
     public List<List<Integer>> levelOrder(TreeNode root) {
-        List<List<Integer>> rs = new ArrayList<>();
-        if (root == null) return rs;
-        rs.add(new ArrayList<>(){{add(root.val);}});
-        hierarchicalTraversal(rs, new ArrayList<>(), root.left, root.right);
-        return rs;
+        if (root == null) return levels;
+        helper(root, 0);
+        return levels;
     }
-
-    void hierarchicalTraversal(List<List<Integer>> rs, List<Integer> list, TreeNode left, TreeNode right){
-        if (left != null)
-            list.add(left.val);
-        if (right != null)
-            list.add(right.val);
-
-    }
-
 
 
 }
