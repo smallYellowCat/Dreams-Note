@@ -601,4 +601,58 @@ public class FourMainTest {
     }
 
 
+    /**
+     * 验证二叉搜索树 leetcode98,
+     * 思路： 二叉搜索树的中序遍历是顺序排序的，所以即将入栈的元素一定要比栈顶元素小
+     * @param root
+     * @return
+     */
+    public boolean isValidBST(TreeNode root) {
+        Stack<TreeNode> stack = new Stack();
+        double inorder = - Double.MAX_VALUE;
+
+        while (!stack.isEmpty() || root != null) {
+            while (root != null) {
+                stack.push(root);
+                root = root.left;
+            }
+            root = stack.pop();
+            // If next element in inorder traversal
+            // is smaller than the previous one
+            // that's not BST.
+            if (root.val <= inorder) return false;
+            inorder = root.val;
+            root = root.right;
+        }
+        return true;
+
+    }
+
+    /**
+     * 递归验证二叉搜索树
+     * @param node
+     * @param lower
+     * @param upper
+     * @return
+     */
+
+    public boolean helper(TreeNode node, Integer lower, Integer upper) {
+        if (node == null) return true;
+
+        int val = node.val;
+        if (lower != null && val <= lower) return false;
+        if (upper != null && val >= upper) return false;
+
+        if (! helper(node.right, val, upper)) return false;
+        if (! helper(node.left, lower, val)) return false;
+        return true;
+    }
+
+
+    public boolean isValidBST2(TreeNode root) {
+        return helper(root, null, null);
+    }
+
+
+
 }
