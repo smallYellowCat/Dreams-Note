@@ -1,12 +1,13 @@
 package com.doudou.plan.java.base;
 
-import javax.print.attribute.HashAttributeSet;
-import java.awt.event.KeyEvent;
-import java.io.Serializable;
+import sun.misc.SharedSecrets;
+
+import java.io.*;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -787,6 +788,13 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Clo
         return null;
     }
 
+
+    /**
+     * jdk8之后增加的方法，通过给定的函数表达式计算出指定key将要放到map中的value
+     * @param key
+     * @param mappingFunction
+     * @return
+     */
     @Override
     public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
         if (mappingFunction == null)
@@ -839,6 +847,261 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Clo
         ++size;
         afterNodeInsert(true);
         return v;
+    }
+
+    @Override
+    public V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        if (remappingFunction == null)
+            throw new NullPointerException();
+        Node<K,V> e; V oldValue;
+        int hash = hash(key);
+        if ((e = getNode(hash, key)) != null &&
+            (oldValue = e.value) != null){
+            V v = remappingFunction.apply(key, oldValue);
+            if (v != null){
+                e.value = v;
+                afterNodeAccess(e);
+                return v;
+            }
+            else
+                removeNode(hash, key, null, false, true);
+        }
+        return null;
+    }
+
+    @Override
+    public V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        if (remappingFunction == null)
+            throw new NullPointerException();
+        int hash = hash(key);
+        Node<K,V>[] tab; Node<K,V> first; int n, i;
+        int binCount = 0;
+        TreeNode<K,V> t = null;
+        Node<K,V> old = null;
+        if ((size > threshold || (tab = table) == null) ||
+            (n = tab.length) == 0)
+            n = (tab = resize()).length;
+        if ((first = tab[i = (n - 1) & hash]) != null){
+            if (first instanceof TreeNode)
+                old = (t = (TreeNode<K,V>)first).getTreeNode(hash, key);
+            else {
+                Node<K,V> e = first; K k;
+                do {
+                    if (e.hash == hash &&
+                        ((k = e.key) == key || (key != null && key.equals(k)))){
+                        old = e;
+                        break;
+                    }
+                    ++binCount;
+
+                }while ((e = e.next) != null);
+            }
+        }
+        V oldValue = (old == null) ? null : old.value;
+        V v = remappingFunction.apply(key, oldValue);
+        if (old != null){
+            if (v != null){
+                old.value = v;
+                afterNodeAccess(old);
+            }
+            else
+                removeNode(hash, key, null, false, true);
+        }
+        else if (v != null){
+            if (t != null)
+                t.putTreeVal(this, tab, hash, key, v);
+            else {
+                tab[i] = newNode(hash, key, v, first);
+                if (binCount >= TREEIFY_THRESHOLD - 1)
+                    treeifyBin(tab, hash);
+            }
+            ++modCount;
+            ++size;
+            afterNodeInsert(true);
+        }
+        return v;
+    }
+
+
+    @Override
+    public V merge(K key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+        if (value == null)
+            throw new NullPointerException();
+        if (remappingFunction == null)
+            throw new NullPointerException();
+        int hash = hash(key);
+        Node<K,V>[] tab; Node<K,V> first; int n, i;
+        int binCount = 0;
+        TreeNode<K,V> t = null;
+        Node<K,V> old = null;
+        if (size > threshold || (tab = table) == null ||
+                (n = tab.length) == 0)
+            n = (tab = resize()).length;
+        if ((first = tab[i = (n - 1) & hash]) != null) {
+            if (first instanceof TreeNode)
+                old = (t = (TreeNode<K,V>)first).getTreeNode(hash, key);
+            else {
+                Node<K,V> e = first; K k;
+                do {
+                    if (e.hash == hash &&
+                            ((k = e.key) == key || (key != null && key.equals(k)))) {
+                        old = e;
+                        break;
+                    }
+                    ++binCount;
+                } while ((e = e.next) != null);
+            }
+        }
+        if (old != null) {
+            V v;
+            if (old.value != null)
+                v = remappingFunction.apply(old.value, value);
+            else
+                v = value;
+            if (v != null) {
+                old.value = v;
+                afterNodeAccess(old);
+            }
+            else
+                removeNode(hash, key, null, false, true);
+            return v;
+        }
+        if (value != null) {
+            if (t != null)
+                t.putTreeVal(this, tab, hash, key, value);
+            else {
+                tab[i] = newNode(hash, key, value, first);
+                if (binCount >= TREEIFY_THRESHOLD - 1)
+                    treeifyBin(tab, hash);
+            }
+            ++modCount;
+            ++size;
+            afterNodeInsert(true);
+        }
+        return value;
+    }
+
+    @Override
+    public void forEach(BiConsumer<? super K, ? super V> action) {
+        Node<K,V>[] tab;
+        if (action == null)
+            throw new NullPointerException();
+        if (size > 0 && (tab = table) != null){
+            int mc= modCount;
+            for (int i = 0; i < tab.length; ++i) {
+                for (Node<K,V> e = tab[i]; e != null; e = e.next)
+                    action.accept(e.key, e.value);
+            }
+            if (modCount != mc)
+                throw new ConcurrentModificationException();
+        }
+
+    }
+
+    @Override
+    public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
+        Node<K,V>[] tab;
+        if (function == null)
+            throw new NullPointerException();
+        if (size > 0 && (tab = table) != null){
+            int mc = modCount;
+            for (int  i = 0; i < tab.length; i++){
+                for (Node<K,V> e = tab[i]; e != null; e = e.next){
+                    e.value = function.apply(e.key, e.value);
+                }
+            }
+            if (modCount != mc)
+                throw new ConcurrentModificationException();
+        }
+
+    }
+
+    /*----------------------------------------------------------------------------------*/
+    //Cloning and serialization
+
+
+    /**
+     * 返回此HashMap实例的浅拷贝：键和值本身没有被克隆
+     * @return
+     * @throws CloneNotSupportedException
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    protected Object clone() throws CloneNotSupportedException {
+        //return super.clone();
+        MyHashMap<K,V> result;
+        try {
+            result = (MyHashMap<K, V>) super.clone();
+        }catch (Exception e){
+            //实现Cloneable之后就不会发生
+            throw new InternalError(e);
+        }
+        result.reinitialize();
+        result.putMapEntries(this, false);
+        return result;
+    }
+
+    //在序列化HashSets的时候也使用这些方法
+    final float loadFactor(){return loadFactor;}
+    final int capacity(){
+        return (table != null) ?  table.length :
+            (threshold > 0) ? threshold :
+            DEFAULT_INITIAL_CAPACITY;
+    }
+
+
+    /**
+     *
+     * @param s
+     * @throws IOException
+     */
+    private void writeObject(ObjectOutputStream s) throws IOException {
+        int buckets = capacity();
+        //写出阈值，加载因子，以及任何隐藏的东西
+        s.defaultWriteObject();
+        s.writeInt(buckets);
+        s.writeInt(size);
+        internalWriteEntries(s);
+    }
+
+
+    private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+        // Read in the threshold (ignored), loadfactor, and any hidden stuff
+        s.defaultReadObject();
+        reinitialize();
+        if (loadFactor <= 0 || Float.isNaN(loadFactor))
+            throw new InvalidObjectException("Illegal load factor: " +
+                                            loadFactor);
+        s.readInt();
+        int mappings = s.readInt();
+        if (mappings < 0)
+            throw new InvalidObjectException("Illegal mappings count: " +
+                                            mappings);
+        else if (mappings > 0) {
+            float lf = Math.min(Math.max(0.25f, loadFactor), 4.0f);
+            float fc = (float)mappings / lf + 1.0f;
+            int cap = ((fc < DEFAULT_INITIAL_CAPACITY) ?
+                        DEFAULT_INITIAL_CAPACITY :
+                        (fc >= MAXIMUM_CAPACITY) ?
+                        MAXIMUM_CAPACITY :
+                        tableSizeFor((int) fc));
+            float ft = (float)cap * lf;
+            threshold = (cap < MAXIMUM_CAPACITY && ft < MAXIMUM_CAPACITY) ?
+                    (int) ft : Integer.MAX_VALUE;
+
+            SharedSecrets.getJavaOISAccess().checkArray(s, Map.Entry[].class, cap);
+            @SuppressWarnings({"rawtypes", "unchecked"})
+            Node<K,V>[] tab = (Node<K, V>[]) new Node[cap];
+            table = tab;
+
+            for (int i = 0; i < mappings; i++){
+                @SuppressWarnings("unchecked")
+                K key = (K) s.readObject();
+                @SuppressWarnings("unchecked")
+                V value = (V) s.readObject();
+                putVal(hash(key), key, value, false, false);
+            }
+        }
     }
 
     /*-----------------------------------------------------------------------------------*/
@@ -1044,25 +1307,72 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Clo
 
         @Override
         public boolean tryAdvance(Consumer<? super V> action) {
+            int hi;
+            if (action == null)
+                throw new NullPointerException();
+            Node<K,V>[] tab = map.table;
+            if (tab != null && tab.length >= (hi = getFence()) && index >= 0){
+                while (current != null || index < hi){
+                    if (current == null)
+                        current = tab[index++];
+                    else {
+                        V v = current.value;
+                        current = current.next;
+                        action.accept(v);
+                        if (map
+                                .modCount != expectedModCount)
+                            throw new ConcurrentModificationException();
+                        return true;
+                    }
+                }
+            }
             return false;
         }
 
 
         @Override
         public void forEachRemaining(Consumer<? super V> action) {
-
+            int i, hi, mc;
+            if (action == null)
+                throw new NullPointerException();
+            MyHashMap<K,V> m = map;
+            Node<K,V>[] tab = m.table;
+            if ((hi =fence) < 0) {
+                mc = expectedModCount = m.modCount;
+                hi = fence = (tab == null) ? 0 : tab.length;
+            }
+            else
+                mc = expectedModCount;
+            if (tab != null && tab.length >= hi &&
+                    (i = index) >= 0 && (i < (index = hi) || current != null)) {
+                Node<K,V> p = current;
+                current = null;
+                do {
+                    if (p == null)
+                        p = tab[i++];
+                    else {
+                        action.accept(p.value);
+                        p = p.next;
+                    }
+                }while (p != null || i < hi);
+                if (m.modCount != mc)
+                    throw new ConcurrentModificationException();
+            }
         }
 
 
         @Override
         public Spliterator<V> trySplit() {
-            return null;
+            int hi = getFence(), lo = index, mid = (lo + hi) >>> 1;
+            return (lo >= mid || current != null) ? null :
+                    new ValueSpliterator<>(map, lo, index = mid,  est >>>= 1,
+                                            expectedModCount);
         }
 
 
         @Override
         public int characteristics() {
-            return 0;
+            return (fence < 0 || est == map.size ? Spliterator.SIZED : 0);
         }
     }
 
@@ -1078,25 +1388,72 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Clo
 
         @Override
         public boolean tryAdvance(Consumer<? super Map.Entry<K, V>> action) {
+            int hi;
+            if (action == null)
+                throw new NullPointerException();
+            Node<K,V>[] tab = map.table;
+            if (tab != null && tab.length >= (hi = getFence()) && index >= 0){
+                while (current != null || index < hi){
+                    if (current == null)
+                        current = tab[index++];
+                    else {
+                        Node<K,V> e = current;
+                        current = current.next;
+                        action.accept(e);
+                        if (map.modCount != expectedModCount)
+                            throw new ConcurrentModificationException();
+                        return true;
+                    }
+                }
+            }
             return false;
         }
 
 
         @Override
         public void forEachRemaining(Consumer<? super Map.Entry<K, V>> action) {
-
+            int i, hi, mc;
+            if (action == null)
+                throw new NullPointerException();
+            MyHashMap<K,V> m = map;
+            Node<K,V>[] tab = m.table;
+            if ((hi = fence) < 0) {
+                mc = expectedModCount = m.modCount;
+                hi = fence = (tab == null) ? 0 : tab.length;
+            }
+            else
+                mc = expectedModCount;
+            if (tab != null && tab.length >= hi &&
+                (i = index) >= 0 && (i < (index = hi) || current != null)){
+                Node<K,V> p = current;
+                current = null;
+                do {
+                    if (p == null)
+                        p = tab[i++];
+                    else {
+                        action.accept(p);
+                        p = p.next;
+                    }
+                } while (p != null || i < hi);
+                if (m.modCount != mc)
+                    throw new ConcurrentModificationException();
+            }
         }
 
 
         @Override
         public Spliterator<Map.Entry<K, V>> trySplit() {
-            return null;
+            int hi = getFence(), lo = index, mid = (lo + hi) >>> 1;
+            return (lo >= mid || current != null) ? null :
+                    new EntrySpliterator<>(map, lo, index = mid, est >>>= 1,
+                                            expectedModCount);
         }
 
 
         @Override
         public int characteristics() {
-            return 0;
+            return (fence < 0 || est == map.size ? Spliterator.SIZED : 0) |
+                Spliterator.DISTINCT;
         }
     }
 
@@ -1151,6 +1508,19 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Clo
     void afterNodeAccess(Node<K,V> p){}
     void afterNodeInsert(boolean evict){}
     void afterNodeRemoval(Node<K,V> p){}
+
+    //仅用于writeObject调用， 用于确保顺序一致
+    void internalWriteEntries(ObjectOutputStream s) throws IOException {
+        Node<K,V>[] tab;
+        if (size > 0 && (tab = table) != null){
+            for (int i = 0; i < tab.length; ++i){
+                for (Node<K,V>  e = tab[i]; e != null; e = e.next){
+                    s.writeObject(e.key);
+                    s.writeObject(e.value);
+                }
+            }
+        }
+    }
 
     /*-----------------------------------------------------------------------------------*/
     // Tree bins
