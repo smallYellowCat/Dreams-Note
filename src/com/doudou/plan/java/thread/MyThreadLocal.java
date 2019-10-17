@@ -304,6 +304,14 @@ public class MyThreadLocal<T> {
         }
 
 
+        /**
+         * 获取与key关联的entry。此方法本身只处理快速路径：直接命中存在的key。
+         * 若没有直接命中就会转到getEntryAfterMiss。这是为了最大限度地提高
+         * 直接命中的性能而设计的，部分原因是使此方法易于内联。
+         *
+         * @param key
+         * @return
+         */
         private Entry getEntry(MyThreadLocal<?> key){
             int i = key.threadLocalHashCode & (table.length - 1);
             Entry e = table[i];
@@ -313,15 +321,151 @@ public class MyThreadLocal<T> {
                 return getEntryAfterMiss(key, i, e);
         }
 
-        private Entry getEntryAfterMiss(MyThreadLocal<?> key, int i, Entry e){
 
+        /**
+         *
+         * @param key
+         * @param i
+         * @param e
+         * @return
+         */
+        private Entry getEntryAfterMiss(MyThreadLocal<?> key, int i, Entry e){
+            Entry[] tab = table;
+            int len = tab.length;
+
+            while (e != null) {
+                MyThreadLocal<?> k = e.get();
+                if (k == key)
+                    return e;
+                if (k == null)
+                    expungeStaleEntry(i);
+                else
+                    i = nextIndex(i, len);
+                e = tab[i];
+            }
+            return null;
         }
 
+        /**
+         * 设置与key关联的值
+         * @param key
+         * @param value
+         */
         private void set(MyThreadLocal<?> key, Object value) {
 
+            Entry[] tab = table;
+            int len = tab.length;
+            int i = key.threadLocalHashCode & (len - 1);
+
+            for (Entry e = tab[i]; e != null;
+                 e = tab[i = nextIndex(i, len)]){
+                MyThreadLocal<?> k = e.get();
+
+                if (k == key){
+                    e.value = value;
+                    return;
+                }
+
+                if (k == null){
+                    replaceStaleEntry(key, value, i);
+                    return;
+                }
+            }
+
+            tab[i] = new Entry(key, value);
+            int sz = ++size;
+            if (!cleanSomeSlots(i, sz) && sz >= threshold)
+                rehash();
         }
 
+        /**
+         * 删除对应条目下的key
+         * @param key
+         */
         private void remove(MyThreadLocal<?> key) {
+            Entry[] tab = table;
+            int len = tab.length;
+            int i = key.threadLocalHashCode & (len - 1);
+            for (Entry e = tab[i]; e != null;
+                 e = tab[i = nextIndex(i, len)]){
+                if (e.get() == key) {
+                    e.clear();
+                    expungeStaleEntry(i);
+                    return;
+                }
+
+            }
+        }
+
+
+        /**
+         * set操作时对遇到的指定key的旧条目使用新值进行替换。
+         * 值存储在value参数条目中，无论指定key对应的entry
+         * 是否已存在。
+         *
+         * 此方法有一个副作用，此方法删除了“run”中包含的所有
+         * 过期条目（A run is a sequence of entries
+         * between two null slots.）
+         * @param key
+         * @param value
+         * @param staleSlot
+         */
+        private void replaceStaleEntry(MyThreadLocal<?> key, Object value,
+                                       int staleSlot){
+            Entry[] tab = table;
+            int len = tab.length;
+            Entry e;
+
+            // Back up to check for prior stale entry in current run.
+            // We clean out whole runs at a time to avoid continual
+            // incremental rehashing due to garbage collector freeing
+            // up refs in bunches (i.e., whenever the collector runs).
+            int slotToExpunge = staleSlot;
+            for (int i = prevIndex(staleSlot, len);
+                 (e = tab[i]) != null;
+                 i = prevIndex(i, len))
+                if (e.get() == null)
+                    slotToExpunge = i;
+
+
+        }
+
+        private int expungeStaleEntry(int staleSlot){
+            Entry[] tab = table;
+            int len = tab.length;
+
+            //expunge entry at staleSlot
+            tab[staleSlot].value = null;
+            tab[staleSlot] = null;
+            size--;
+
+            //Rehash until we encounter null
+
+        }
+
+        private boolean cleanSomeSlots(int i, int n){
+
+        }
+
+
+        /**
+         * 重新打包 and/or 调整表的大小。首先扫描整个表，
+         * 删除陈旧的条目。如果这还不够缩小表的大小，则将
+         * 表的大小加倍。
+         */
+        private void rehash(){
+            expungeStaleEntries();
+
+            //Use lower threshold for doubling to avoid hysteresis
+            if (size >= threshold - threshold / 4)
+               resize();
+        }
+
+        private void resize() {
+
+        }
+
+        private void expungeStaleEntries(){
 
         }
 
