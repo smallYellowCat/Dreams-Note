@@ -60,7 +60,9 @@ public class RedBlackTree<E extends Comparable<? super E>> {
 
     private RedBlackNode<E> rotate(E item, RedBlackNode<E> parent){
         if (compare(item, parent) < 0)
-            return parent.left = compare(item, parent.left) < 0 ?
+            //return parent.left = compare(item, parent.left) < 0 ?
+            return null;
+        return null;
 
     }
 
