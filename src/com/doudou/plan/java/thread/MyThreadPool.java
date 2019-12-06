@@ -21,7 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>
 *   <ul>线程池的参数：</ul>
  *  <li>corePoolSize ： 核心线程数, 线程池刚创建的时候线程数量为0，
- *  当队列满后如果最大线程数大于核心线程数就开始创建新的线程</li>
+ *  当有任务提交时，如果无可用线程则创建新线程</li>
  *  <li>maximumPoolSize ： 最大线程数</li>
  *  <li>keepAliveTime ：存活时间</li>
  *  <li>unit ： 时间单位</li>
