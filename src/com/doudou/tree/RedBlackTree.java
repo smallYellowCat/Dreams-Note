@@ -1,4 +1,4 @@
-package com.doudou.plan.database;
+package com.doudou.tree;
 
 import com.sun.org.apache.regexp.internal.RE;
 
@@ -39,6 +39,38 @@ public class RedBlackTree<E extends Comparable<? super E>> {
         nullNode.left = nullNode.right = nullNode;
         header = new RedBlackNode<>(null);
         header.left = header.right = nullNode;
+    }
+
+
+    /**
+     *
+     * @param item
+     * @return
+     */
+    public RedBlackNode<E> find(E item){
+        RedBlackNode<E> p = current;
+        do {
+            int r;
+            RedBlackNode<E> pl = p.left, pr = p.right;
+            if ((r = compare(item, p)) == 0)
+                return p;
+            else if (r > 0)
+                p = pl;
+            else
+                p = pr;
+
+        }while (p != null);
+
+        return null;
+    }
+
+    static <E> RedBlackNode<E> rotateLeft(RedBlackNode<E> root, RedBlackNode<E> p){
+        return null;
+    }
+
+
+    static <E> RedBlackNode<E> rotateRight(RedBlackNode<E> root, RedBlackNode<E> p){
+        return null;
     }
 
     public void printTree(){

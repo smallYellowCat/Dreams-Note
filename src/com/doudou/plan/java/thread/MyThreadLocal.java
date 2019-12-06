@@ -440,11 +440,12 @@ public class MyThreadLocal<T> {
             size--;
 
             //Rehash until we encounter null
+            return 0;
 
         }
 
         private boolean cleanSomeSlots(int i, int n){
-
+            return false;
         }
 
 

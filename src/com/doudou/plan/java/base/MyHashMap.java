@@ -1930,8 +1930,90 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Clo
         Node<String, Object> node = new Node<>(1, "1", "1", null);
         Type[] types = node.getClass().getGenericInterfaces();
         String s = "dsadasdads";
-        System.out.println(Objects.hash(s));
-        System.out.println(Objects.hashCode(s));
+        //System.out.println(Objects.hash(s));
+        //System.out.println(Objects.hashCode(s));
+
+        B[] b1 = new B[3];
+        b1[0] = new B("1A");
+        b1[1] = new B("2B");
+        b1[2] = new B("3C");
+
+        Thread1 t1 = new Thread1(b1);
+        Thread2 t2 = new Thread2(b1);
+
+        t1.start();
+        t2.start();
+
+    }
+
+
+    static class Thread1 extends Thread{
+
+        private Map map;
+
+        private B[] b;
+
+        public Thread1(Map map){
+            this.map = map;
+        }
+
+        public Thread1(B[] b){
+            this.b = b;
+        }
+
+        @Override
+        public void run() {
+            super.run();
+
+            for (B x : b){
+                try {
+                    Thread.sleep(20);
+                    System.out.println(x.getName());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    static class Thread2 extends Thread{
+
+        private Map map;
+
+        private B[] b;
+
+        public Thread2(Map map){
+            this.map = map;
+        }
+
+        public Thread2(B[] b){
+            this.b = b;
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            for (int  i = 2; i < 0; i--){
+                try {
+                    Thread.sleep(9);
+                    b[i] = new B(""+ i);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    static class B {
+        private String name;
+
+        public B(String name){
+            this.name = name;
+        }
+
+        public String getName(){
+            return name;
+        }
     }
 
 

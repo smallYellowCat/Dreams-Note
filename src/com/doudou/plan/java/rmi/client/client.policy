@@ -1,0 +1,3 @@
+grant codeBase "E:\idea_project\mySelfProject\LeetCode\src\com\doudou\plan\java\rmi\client" {
+    permission java.security.AllPermission;
+};
