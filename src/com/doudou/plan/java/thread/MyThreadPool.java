@@ -10,6 +10,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 *   <ul>线程池的参数：</ul>
  *  <li>corePoolSize ： 核心线程数, 线程池刚创建的时候线程数量为0，
  *  当有任务提交时，如果无可用线程则创建新线程</li>
- *  <li>maximumPoolSize ： 最大线程数</li>
+ *  <li>maximumPoolSize ： 最大线程数, 当队列满了之后允许创建的最大线程数</li>
  *  <li>keepAliveTime ：存活时间</li>
  *  <li>unit ： 时间单位</li>
  *  <li>workQueue ：工作队列，有三种可选值：
@@ -42,9 +44,22 @@ import java.util.concurrent.locks.ReentrantLock;
  *  线程工厂用于生产线程，默认情况下生产的线程都是在同一线程组，具有NORM_PRIORITY
  *  优先级， 非守护线程。生产的线程名都是：pool-poolNumber-thread-threadNumber,
  *  线程栈的大小为0. 线程生产失败或者返回null后Executor可以继续创建，但是无法提交任务。</li>
- *  <li>handler ： 拒绝策略</li>
+ *  <li>handler ： 拒绝策略。 当Executor关闭的时候，提交新任务来执行会被拒绝，当线程达到最大数，
+ *  且工作队列已满时也会拒绝新任务提交。在上述两种情况下execute方法就会调用{@link
+ *  RejectedExecutionHandler#rejectedExecution(Runnable, ThreadPoolExecutor)}
+ *  方法（线程池设置的拒绝策略），框架提供了四个可选的拒绝策略：</li>
+ *  <ol>
+ *  <li>{@link ThreadPoolExecutor.AbortPolicy}, 此策略为默认拒绝策略，会抛弃任务，在拒绝时抛出一个
+ *  {@link RejectedExecutionException}异常，此异常是一个未受检查的异常，调用者可以捕获此异常
+ *  来自己编写处理代码。</li>
+ *  <li>{@link ThreadPoolExecutor.CallerRunsPolicy}， 此策略中是调用execute的线程本身来
+ *  执行这个拒绝策略，这是一个简单的反馈控制机制能够降低提交任务的速率。此时任务未被抛弃</li>
+ *  <li>{@link ThreadPoolExecutor.DiscardPolicy}</li>
+ *  <li>{@link ThreadPoolExecutor.DiscardOldestPolicy}</li>
  *
- *  <ul>任务和任务提交：</ul>e
+ *  </ol>
+ *
+ *  <ul>任务和任务提交：</ul>
  *  </p>
  *
  *
