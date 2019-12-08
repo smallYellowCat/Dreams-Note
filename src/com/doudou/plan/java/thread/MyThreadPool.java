@@ -2,7 +2,6 @@ package com.doudou.plan.java.thread;
 
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import javafx.concurrent.Task;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -52,10 +51,12 @@ import java.util.concurrent.locks.ReentrantLock;
  *  <li>{@link ThreadPoolExecutor.AbortPolicy}, 此策略为默认拒绝策略，会抛弃任务，在拒绝时抛出一个
  *  {@link RejectedExecutionException}异常，此异常是一个未受检查的异常，调用者可以捕获此异常
  *  来自己编写处理代码。</li>
- *  <li>{@link ThreadPoolExecutor.CallerRunsPolicy}， 此策略中是调用execute的线程本身来
- *  执行这个拒绝策略，这是一个简单的反馈控制机制能够降低提交任务的速率。此时任务未被抛弃</li>
- *  <li>{@link ThreadPoolExecutor.DiscardPolicy}</li>
- *  <li>{@link ThreadPoolExecutor.DiscardOldestPolicy}</li>
+ *  <li>{@link ThreadPoolExecutor.CallerRunsPolicy}， 此策略是让调用execute的线程本身来
+ *  执行这个任务，这是一个简单的反馈控制机制，能够降低提交任务的速率。如果线程池关闭了，
+ *  任务会被丢弃</li>
+ *  <li>{@link ThreadPoolExecutor.DiscardPolicy}，任务不能被执行时直接丢弃</li>
+ *  <li>{@link ThreadPoolExecutor.DiscardOldestPolicy}，丢弃最老的任务即工作队列队头元素，
+ *  并尝试再一次执行此任务，可能会再次失败也可能导致重复执行。</li>
  *
  *  </ol>
  *
@@ -69,7 +70,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  *
  */
-public class MyThreadPool {
+public class MyThreadPool extends ThreadPoolExecutor{
 
     private ThreadFactory namedThreadFactory = new ThreadFactory() {
         @Override
@@ -107,6 +108,23 @@ public class MyThreadPool {
              }
          );
 
+    public MyThreadPool(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
+        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+    }
+
+    public MyThreadPool() {
+        super(0, 0, 0, TimeUnit.DAYS, null);
+    }
+
+    @Override
+    protected void beforeExecute(Thread t, Runnable r) {
+        super.beforeExecute(t, r);
+    }
+
+    @Override
+    protected void afterExecute(Runnable r, Throwable t) {
+        super.afterExecute(r, t);
+    }
 
     /**
      * 入口函数，自动生成
@@ -116,7 +134,6 @@ public class MyThreadPool {
         myThreadPool.executor.allowCoreThreadTimeOut(true);
         for (int  i = 0; i < 20; i++){
             MyTask task = new MyTask(i);
-            Task task1;
             //executor2.submit(task);
 
             /*FutureTask<Object> futureTask = (FutureTask<Object>)
