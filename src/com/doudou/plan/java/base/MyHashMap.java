@@ -1,6 +1,7 @@
 package com.doudou.plan.java.base;
 
-import sun.misc.SharedSecrets;
+
+import jdk.internal.access.SharedSecrets;
 
 import java.io.*;
 import java.lang.reflect.ParameterizedType;
@@ -1089,7 +1090,7 @@ public class MyHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Clo
             threshold = (cap < MAXIMUM_CAPACITY && ft < MAXIMUM_CAPACITY) ?
                     (int) ft : Integer.MAX_VALUE;
 
-            SharedSecrets.getJavaOISAccess().checkArray(s, Map.Entry[].class, cap);
+            SharedSecrets.getJavaObjectInputStreamAccess().checkArray(s, Map.Entry[].class, cap);
             @SuppressWarnings({"rawtypes", "unchecked"})
             Node<K,V>[] tab = (Node<K, V>[]) new Node[cap];
             table = tab;
