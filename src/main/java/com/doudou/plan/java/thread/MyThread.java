@@ -1,7 +1,5 @@
 package com.doudou.plan.java.thread;
 
-import com.sun.istack.internal.NotNull;
-import sun.nio.ch.Interruptible;
 
 import java.security.AccessControlContext;
 
@@ -61,14 +59,14 @@ public class MyThread implements Runnable{
 
     volatile Object parkBlocker;
 
-    private volatile Interruptible blocker;
+    //private volatile Interruptible blocker;
     private final Object blockerLock = new Object();
 
-    void blockedOn(Interruptible b){
+    /*void blockedOn(Interruptible b){
         synchronized (blockerLock){
             blocker = b;
         }
-    }
+    }*/
 
     public final static int MIN_PRIORITY = 1;
 

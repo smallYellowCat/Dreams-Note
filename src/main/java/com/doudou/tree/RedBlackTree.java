@@ -1,6 +1,6 @@
 package com.doudou.tree;
 
-import com.sun.org.apache.regexp.internal.RE;
+//import com.sun.org.apache.regexp.internal.RE;
 
 /**
  * AVL平衡二叉树的变种，在最坏的情况下操作花费O(log N)时间。
