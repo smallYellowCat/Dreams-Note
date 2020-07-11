@@ -35,6 +35,16 @@ public class ProxyPattern {
         proxy1.killBoss();
         proxy1.upgrade();
 
+
+        //基于Jdk动态代理的AOP
+        IGamePlayer gamePlayer2 = new GamePlayer("DD");
+        InvocationHandler handler1 = new GamePlayIH(gamePlayer2);
+        IGamePlayer dynamicProxy = DynamicProxy.newProxyInstance(gamePlayer2.getClass().getClassLoader(),
+                gamePlayer2.getClass().getInterfaces(), handler1);
+        dynamicProxy.login("dd", "123654");
+        dynamicProxy.killBoss();
+        dynamicProxy.upgrade();
+
     }
 
 }
@@ -102,6 +112,7 @@ class GamePlayIH implements InvocationHandler {
         if (method.getName().equals("login")) {
             System.out.println("有人在登录账号：" + args[0]);
         }
+        new AfterAdvice().exec();
         return result;
     }
 }
@@ -213,4 +224,39 @@ class GamePlayerProxy implements IGamePlayer, Proxy{
     }
 }
 
-//==============================================================
+//=======================AOP的JDK动态代理实现===========================
+
+//首先来定义一个通知
+interface Advice {
+    void exec();
+}
+
+
+//定义一个前置通知
+class BeforeAdvice implements Advice {
+    @Override
+    public void exec() {
+        System.out.println("执行前置通知！！！！");
+    }
+}
+
+//定义一个后置通知
+class AfterAdvice implements Advice {
+    @Override
+    public void exec() {
+        System.out.println("执行后置通知！！！！");
+    }
+}
+
+//定义一个动态代理类
+class DynamicProxy {
+    public static <T>  T newProxyInstance(ClassLoader loader, Class<?>[] interfaces, InvocationHandler handler) {
+        //寻找JoinPoint连接点，AOP框架使用元数据定义
+        if (true) {
+            //执行前置通知
+            new BeforeAdvice().exec();
+        }
+        T proxyInstance = (T) java.lang.reflect.Proxy.newProxyInstance(loader, interfaces, handler);
+        return proxyInstance;
+    }
+}
