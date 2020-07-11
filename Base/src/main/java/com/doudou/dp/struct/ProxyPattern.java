@@ -1,5 +1,8 @@
 package com.doudou.dp.struct;
 
+import org.springframework.aop.AfterReturningAdvice;
+import org.springframework.aop.ThrowsAdvice;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -259,4 +262,14 @@ class DynamicProxy {
         T proxyInstance = (T) java.lang.reflect.Proxy.newProxyInstance(loader, interfaces, handler);
         return proxyInstance;
     }
+}
+
+
+//看一下Spring的AOP
+
+class SpringAOP {
+    org.springframework.aop.BeforeAdvice beforeAdvice;
+    org.springframework.aop.AfterAdvice afterAdvice;
+    AfterReturningAdvice afterReturningAdvice;
+
 }
