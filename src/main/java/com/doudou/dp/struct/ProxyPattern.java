@@ -22,6 +22,19 @@ public class ProxyPattern {
         proxyPlayer.login("LiSi", "123456");
         proxyPlayer.killBoss();
         proxyPlayer.upgrade();
+
+
+        //动态代理，JDK的动态代理
+        IGamePlayer gamePlayer1 = new GamePlayer("豆豆");
+        InvocationHandler handler = new GamePlayIH(gamePlayer1);
+        ClassLoader loader = gamePlayer1.getClass().getClassLoader();
+        //动态生成代理
+        IGamePlayer proxy1 = (IGamePlayer) java.lang.reflect.Proxy
+                .newProxyInstance(loader, new Class[]{IGamePlayer.class}, handler);
+        proxy1.login("dpw", "123456");
+        proxy1.killBoss();
+        proxy1.upgrade();
+
     }
 
 }
@@ -86,6 +99,9 @@ class GamePlayIH implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Object result = method.invoke(this.object, args);
+        if (method.getName().equals("login")) {
+            System.out.println("有人在登录账号：" + args[0]);
+        }
         return result;
     }
 }
