@@ -1,5 +1,9 @@
 package com.doudou.dp.struct;
 
+import net.sf.cglib.core.DebuggingClassWriter;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
 import org.springframework.aop.AfterReturningAdvice;
 import org.springframework.aop.ThrowsAdvice;
 
@@ -48,9 +52,19 @@ public class ProxyPattern {
         dynamicProxy.killBoss();
         dynamicProxy.upgrade();
 
+        // 代理类class文件存入本地磁盘方便我们反编译查看源码
+        System.setProperty(DebuggingClassWriter.DEBUG_LOCATION_PROPERTY, "D:\\code");
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(CGTest.class);
+        enhancer.setCallback(new MyMethodInterceptor());
+
+        CGTest proxyCG = (CGTest) enhancer.create();
+        proxyCG.methodX();
+
     }
 
 }
+
 
 //========================普通代理==============================
 //客户端只能访问代理角色，而不能访问真实角色。
@@ -71,7 +85,33 @@ public class ProxyPattern {
 //实现阶段不用关心代理谁，而在运行阶段才指定代理哪一个对象。
 //AOP的核心就是动态代理机制
 
+//动态代理动态生成的是代理对象，并不是被代理的对象！！！！
 
+//代理对象 = 增强代码 + 原对象（目标对象）
+
+//jdk动态代理是实现接口对被代理对象做方法增强， cglib动态代理是加载被代理对象的class文件，修改字节码生成子类来做方法增强。
+
+
+//cglib动态代理
+class CGTest {
+    public void methodX() {
+        System.out.println("this is method x");
+    }
+}
+
+
+class MyMethodInterceptor implements MethodInterceptor {
+    @Override
+    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+        System.out.println("这是方法：" + method.getName() + " 的前置通知");
+        Object rs = methodProxy.invokeSuper(o, objects);
+        System.out.println("这是方法：" + method.getName() + " 的后置通知");
+        return rs;
+    }
+}
+
+
+//jdk动态代理
 interface IGamePlayer {
     void login(String user, String pwd);
     void killBoss();
