@@ -1,4 +1,4 @@
-package com.doudou.java.thread;
+package com.doudou.java.thread.copy;
 
 import java.lang.ref.WeakReference;
 import java.util.Objects;
