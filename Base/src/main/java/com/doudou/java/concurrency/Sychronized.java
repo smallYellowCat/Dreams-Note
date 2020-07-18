@@ -36,7 +36,12 @@ package com.doudou.java.concurrency;
 
 //锁消除
 
+//锁消除是编译器通过逃逸分析对代码进行的优化，认为不存在数据共享竞争的时对锁进行消除。
+
 //锁粗化
+
+//锁粗化是针对在一个方法中频繁的对同一对象进行加锁和释放锁时。会扩大加锁范围，
+// 减少加锁和释放锁增加的额外系统开销
 public class Sychronized {
 
     private final Object obj = new Object();
