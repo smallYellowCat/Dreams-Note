@@ -28,7 +28,7 @@ where <option> is one of:
  
 
 ## 2.jmap
-
+jmap主要用于生成堆的dump文件， 堆内存的一些信息
 ```text
 Usage:
     jmap -clstats <pid>
@@ -51,8 +51,20 @@ Usage:
 
     Example: jmap -dump:live,format=b,file=heap.bin <pid>
 ```
+示例：
+```text
+C:\Users\dream>jmap -histo 1152
+ num     #instances         #bytes  class name (module)
+-------------------------------------------------------
+   1:         20220        8952360  [B (java.base@12.0.1)
+   2:          1426        1352064  [I (java.base@12.0.1)
+   3:         19222         461328  java.lang.String (java.base@12.0.1)
+   4:          4006         446624  java.lang.Class (java.base@12.0.1)
+```
 
 ## 3.jstack
+
+jstack用来生成当前时刻虚拟机的线程快照
 
 ```text
 Usage:
