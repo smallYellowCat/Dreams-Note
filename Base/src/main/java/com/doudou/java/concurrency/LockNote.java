@@ -199,8 +199,7 @@ class Task2 {
     }
 
 }
+//基于Lock接口可以总结显式锁的特点： 显式锁事一个支持定时获取，可以被中断的锁。
 
+//ReentrantLock和ReadLock， WriteLock
 
-//AQS，显示锁的实现原理， RetreenLock和ReadLock， WriteLock
-
-//synchronized，膨胀锁，锁升级， JMM

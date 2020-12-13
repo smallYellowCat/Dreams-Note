@@ -27,6 +27,7 @@ public class SychronizedTest {
 
 
         Thread t2 = new Thread(new Runnable() {
+
             @Override
             public void run() {
                 try {
