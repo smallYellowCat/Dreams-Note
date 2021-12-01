@@ -10,5 +10,6 @@
     <modules>
         <module>Base</module>
         <module>springboot-test</module>
+        <module>DataReplication</module>
     </modules>
 </project>
